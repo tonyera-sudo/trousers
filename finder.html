@@ -1,0 +1,312 @@
+<title>Trouser Finder</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..100,400..800&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a single column "fitting ticket" — your spec on top, then passes, near misses, and your shortlist. */
+:root {
+  --bg: #f3f4f6;
+  --panel: #ffffff;
+  --fg: #1b2230;
+  --muted: #5d6676;
+  --line: #d9dde4;
+  --accent: #c8901c;      /* tailor's tape */
+  --accent-ink: #1b2230;
+  --good: #1f7a4d;
+  --warn: #a8660b;
+  --bad: #b23a3a;
+  --good-bg: #e4f3ea;
+  --warn-bg: #fbf0dc;
+  --bad-bg: #f8e3e3;
+  --display: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --body: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #12161d; --panel: #1a2029; --fg: #e7eaf0; --muted: #9aa3b2; --line: #2c3441;
+    --accent: #e0aa3e; --accent-ink: #12161d;
+    --good: #5fc492; --warn: #e5a54a; --bad: #ef7b7b;
+    --good-bg: #173226; --warn-bg: #36290f; --bad-bg: #3a1c1c;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #12161d; --panel: #1a2029; --fg: #e7eaf0; --muted: #9aa3b2; --line: #2c3441;
+  --accent: #e0aa3e; --accent-ink: #12161d;
+  --good: #5fc492; --warn: #e5a54a; --bad: #ef7b7b;
+  --good-bg: #173226; --warn-bg: #36290f; --bad-bg: #3a1c1c;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 15px; line-height: 1.5; }
+.wrap { max-width: 980px; margin: 0 auto; padding-inline: 16px; padding-block: 28px 64px; display: grid; gap: 28px; }
+h1, h2, h3 { font-family: var(--display); text-wrap: balance; margin: 0; }
+h1 { font-size: clamp(30px, 6vw, 44px); font-stretch: 78%; font-weight: 800; letter-spacing: -0.01em; line-height: 1.05; }
+h2 { font-size: 20px; font-stretch: 85%; font-weight: 700; }
+.eyebrow { font-family: var(--mono); font-size: 11.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.lede { color: var(--muted); max-width: 62ch; margin: 8px 0 0; }
+.tape { height: 14px; border-radius: 2px; background:
+  repeating-linear-gradient(90deg, var(--accent-ink) 0 1px, transparent 1px 10px),
+  repeating-linear-gradient(90deg, var(--accent-ink) 0 1px, transparent 1px 50px) ;
+  background-size: 100% 6px, 100% 11px; background-repeat: no-repeat; background-position: top left, top left;
+  background-color: var(--accent); opacity: .9; }
+
+header.top { display: grid; gap: 14px; }
+.runline { display: flex; flex-wrap: wrap; gap: 8px 18px; font-family: var(--mono); font-size: 12.5px; color: var(--muted); }
+.runline b { color: var(--fg); font-weight: 500; }
+
+/* spec */
+.spec { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 18px; display: grid; gap: 16px; }
+.spec-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
+.m { border-left: 3px solid var(--accent); padding: 2px 0 2px 10px; min-width: 0; }
+.m .k { font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); }
+.m .v { font-family: var(--mono); font-size: 17px; font-variant-numeric: tabular-nums; }
+.m .r { font-size: 12px; color: var(--bad); }
+.prefs { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 6px 24px; font-size: 14px; }
+.prefs div { min-width: 0; }
+.prefs b { font-weight: 600; }
+.swatches { display: inline-flex; gap: 4px; vertical-align: middle; margin-left: 4px; }
+.sw { width: 14px; height: 14px; border-radius: 3px; border: 1px solid var(--line); display: inline-block; }
+
+/* tabs */
+.tabs { display: flex; gap: 6px; flex-wrap: wrap; border-bottom: 1px solid var(--line); }
+.tab { font: inherit; font-weight: 600; background: none; border: 0; padding: 10px 12px; color: var(--muted); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; }
+.tab[aria-selected="true"] { color: var(--fg); border-bottom-color: var(--accent); }
+.tab .n { font-family: var(--mono); font-weight: 400; font-size: 12px; margin-left: 4px; }
+.tab:focus-visible, button:focus-visible, select:focus-visible, textarea:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* items */
+.list { display: grid; gap: 14px; }
+.item { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 16px; display: grid; gap: 12px; }
+.item-head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 16px; align-items: baseline; }
+.item-head > div { min-width: 0; }
+.retailer { font-family: var(--mono); font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+.item h3 { font-size: 18px; font-stretch: 88%; font-weight: 700; }
+.item h3 a { color: inherit; text-decoration-color: var(--accent); text-underline-offset: 3px; }
+.price { font-family: var(--mono); font-size: 20px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.price s { color: var(--muted); font-size: 14px; margin-right: 6px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { font-size: 12px; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--line); white-space: nowrap; }
+.chip.good { background: var(--good-bg); color: var(--good); border-color: transparent; }
+.chip.warn { background: var(--warn-bg); color: var(--warn); border-color: transparent; }
+.chip.bad { background: var(--bad-bg); color: var(--bad); border-color: transparent; }
+.chip.size { background: var(--accent); color: var(--accent-ink); border-color: transparent; font-weight: 700; }
+.fit-wrap { overflow-x: auto; }
+table.fit { border-collapse: collapse; width: 100%; font-size: 13px; min-width: 520px; }
+.fit th, .fit td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line); }
+.fit th { font-family: var(--mono); font-weight: 500; font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+.fit td.num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; vertical-align: 1px; }
+.dot.good { background: var(--good); } .dot.warn { background: var(--warn); } .dot.bad { background: var(--bad); }
+.meta { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 6px 20px; font-size: 13.5px; }
+.meta div { min-width: 0; }
+.meta .k { color: var(--muted); }
+.reason { font-size: 14px; padding: 8px 10px; border-radius: 6px; background: var(--bad-bg); color: var(--bad); }
+.note-bar { display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-start; border-top: 1px dashed var(--line); padding-top: 12px; }
+.note-bar label { font-size: 12px; color: var(--muted); display: grid; gap: 4px; }
+select, textarea { font: inherit; font-size: 14px; color: var(--fg); background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: 6px 8px; }
+textarea { width: min(460px, 100%); min-height: 38px; resize: vertical; }
+.note-bar .grow { flex: 1 1 260px; min-width: 0; }
+.saved { font-size: 12px; color: var(--good); align-self: center; }
+.checked { font-family: var(--mono); font-size: 11.5px; color: var(--muted); }
+
+.empty { background: var(--panel); border: 1px dashed var(--line); border-radius: 10px; padding: 22px; color: var(--muted); }
+.empty b { color: var(--fg); }
+.howto { font-size: 14px; color: var(--muted); }
+.howto code { font-family: var(--mono); color: var(--fg); background: var(--panel); border: 1px solid var(--line); padding: 1px 6px; border-radius: 4px; }
+@media (prefers-reduced-motion: no-preference) { .item { transition: border-color .15s; } .item:hover { border-color: var(--muted); } }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="tape" aria-hidden="true"></div>
+    <div>
+      <div class="eyebrow">Fit-checked smart trousers · UK</div>
+      <h1>Trouser Finder</h1>
+      <p class="lede">Every pair here was checked against your measurements on the retailer's own product page: size chart, stock in your size and length, fabric, price and returns. Ask Claude to “run a search” to refresh.</p>
+    </div>
+    <div class="runline" id="runline"><span>Last search: <b>not run yet</b></span></div>
+  </header>
+
+  <section class="spec" aria-labelledby="spec-h">
+    <h2 id="spec-h">Your fit targets <span class="eyebrow">garment, measured flat</span></h2>
+    <div class="spec-grid">
+      <div class="m"><div class="k">Waist</div><div class="v">16–16.5″</div></div>
+      <div class="m"><div class="k">Thigh</div><div class="v">11.5–12.5″</div><div class="r">reject &lt; 11″</div></div>
+      <div class="m"><div class="k">Knee</div><div class="v">8.25–9″</div></div>
+      <div class="m"><div class="k">Leg opening</div><div class="v">7–7.75″</div><div class="r">reject &gt; 8.25″</div></div>
+      <div class="m"><div class="k">Front rise</div><div class="v">10–11.5″</div></div>
+      <div class="m"><div class="k">Inseam</div><div class="v">70–72 cm</div></div>
+    </div>
+    <div class="prefs">
+      <div><b>Colours</b> navy, brown, charcoal / dark grey, black
+        <span class="swatches" aria-hidden="true"><i class="sw" style="background:#1f2a44"></i><i class="sw" style="background:#5a3e2b"></i><i class="sw" style="background:#3a3d42"></i><i class="sw" style="background:#111"></i></span></div>
+      <div><b>Fabric</b> wool first; must drape. No fluffy cotton chino.</div>
+      <div><b>Style</b> single pleat favoured; mid rise; touching or just above the shoe</div>
+      <div><b>Budget</b> up to £110 · new only</div>
+      <div><b>Returns</b> online + QR code + Post Office drop-off; small fee OK</div>
+      <div><b>Size hints</b> Zara 38 · Next 30–32 R/S · H&amp;M S · Levi's W29</div>
+    </div>
+  </section>
+
+  <section aria-label="Results">
+    <div class="tabs" role="tablist">
+      <button class="tab" role="tab" id="tab-pass" aria-selected="true" data-view="pass">Fits you<span class="n" id="n-pass">0</span></button>
+      <button class="tab" role="tab" id="tab-near" aria-selected="false" data-view="near">Near misses<span class="n" id="n-near">0</span></button>
+      <button class="tab" role="tab" id="tab-short" aria-selected="false" data-view="short">My shortlist<span class="n" id="n-short">0</span></button>
+    </div>
+    <div class="list" id="list" style="margin-top:16px"></div>
+  </section>
+
+  <p class="howto">To refresh, tell Claude <code>run a search</code>. New finds, price changes and sold-out sizes are flagged on each card. Your status and notes are kept between searches.</p>
+</div>
+
+<script>
+(function () {
+  const STATUSES = [
+    ["", "—"], ["to-try", "To try"], ["ordered", "Ordered"], ["returned", "Returned"], ["keeper", "Keeper"], ["not-for-me", "Not for me"]
+  ];
+  const ROWS = [
+    ["waist", "Waist"], ["thigh", "Thigh"], ["knee", "Knee"], ["hem", "Leg opening"], ["rise", "Front rise"], ["inseam", "Inseam"]
+  ];
+  let items = [];
+  let view = "pass";
+  let db = null;
+  try { const v = localStorage.getItem("tf-view"); if (v) view = v; } catch (e) {}
+
+  const $ = (s) => document.querySelector(s);
+  const el = (tag, attrs, ...kids) => {
+    const n = document.createElement(tag);
+    for (const [k, v] of Object.entries(attrs || {})) {
+      if (k === "class") n.className = v; else if (k === "text") n.textContent = v; else n.setAttribute(k, v);
+    }
+    for (const c of kids) if (c != null) n.append(c);
+    return n;
+  };
+  const fmtDate = (iso) => { try { return new Date(iso).toLocaleString("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }); } catch (e) { return iso; } };
+  const money = (p) => (p == null ? "—" : "£" + Number(p).toFixed(2).replace(/\.00$/, ""));
+
+  function setView(v) {
+    view = v;
+    try { localStorage.setItem("tf-view", v); } catch (e) {}
+    document.querySelectorAll(".tab").forEach((t) => t.setAttribute("aria-selected", String(t.dataset.view === v)));
+    render();
+  }
+  document.querySelectorAll(".tab").forEach((t) => t.addEventListener("click", () => setView(t.dataset.view)));
+
+  function filtered() {
+    if (view === "short") return items.filter((i) => i.status && i.status !== "not-for-me");
+    return items.filter((i) => i.verdict === view);
+  }
+
+  function card(it) {
+    const head = el("div", { class: "item-head" },
+      el("div", {},
+        el("div", { class: "retailer", text: it.retailer || "" }),
+        el("h3", {}, el("a", { href: it.url || "#", target: "_blank", rel: "noopener", text: it.name || "Untitled" }))
+      ),
+      el("div", { class: "price" }, it.wasPrice ? el("s", { text: money(it.wasPrice) }) : null, money(it.price))
+    );
+
+    const chips = el("div", { class: "chips" });
+    if (it.size) chips.append(el("span", { class: "chip size", text: "Buy: " + it.size }));
+    if (it.colour) chips.append(el("span", { class: "chip", text: it.colour }));
+    if (it.fabric) chips.append(el("span", { class: "chip", text: it.fabric }));
+    if (it.pleat) chips.append(el("span", { class: "chip", text: it.pleat }));
+    if (it.inStock === true) chips.append(el("span", { class: "chip good", text: "In stock in your size" }));
+    if (it.inStock === false) chips.append(el("span", { class: "chip bad", text: "Sold out in your size" }));
+    for (const f of it.flags || []) {
+      const cls = /sold|removed/i.test(f) ? "bad" : /drop|new|restock/i.test(f) ? "good" : "warn";
+      chips.append(el("span", { class: "chip " + cls, text: f }));
+    }
+
+    const parts = [head, chips];
+    if (it.verdict === "near" && it.reason) parts.push(el("div", { class: "reason", text: "Why not: " + it.reason }));
+
+    if (it.fit) {
+      const tb = el("tbody");
+      for (const [k, label] of ROWS) {
+        const r = it.fit[k]; if (!r) continue;
+        const st = r.verdict || "warn";
+        tb.append(el("tr", {},
+          el("td", {}, el("span", { class: "dot " + st, "aria-hidden": "true" }), label),
+          el("td", { class: "num", text: r.value || "not given" }),
+          el("td", { class: "num", text: r.target || "" }),
+          el("td", { text: r.note || (st === "good" ? "On target" : st === "bad" ? "Out of range" : "Unverified / borderline") })
+        ));
+      }
+      parts.push(el("div", { class: "fit-wrap" }, el("table", { class: "fit" },
+        el("thead", {}, el("tr", {}, el("th", { text: "Point" }), el("th", { text: "This size" }), el("th", { text: "Target" }), el("th", { text: "Verdict" }))),
+        tb)));
+    }
+
+    const meta = el("div", { class: "meta" });
+    if (it.returns) meta.append(el("div", {}, el("span", { class: "k", text: "Returns " }), it.returns));
+    if (it.why) meta.append(el("div", {}, el("span", { class: "k", text: "Why it suits you " }), it.why));
+    if (meta.childElementCount) parts.push(meta);
+
+    // tracker controls
+    const sel = el("select", { id: "st-" + it.id, "aria-label": "Status" });
+    for (const [v, l] of STATUSES) { const o = el("option", { value: v, text: l }); if ((it.status || "") === v) o.selected = true; sel.append(o); }
+    const ta = el("textarea", { id: "nt-" + it.id, placeholder: "Notes (fit when tried, size, etc.)" }); ta.value = it.notes || "";
+    const saved = el("span", { class: "saved", "aria-live": "polite" });
+    const save = async (patch) => {
+      if (!db) { saved.textContent = "Can't save in this view"; return; }
+      try { await db.doc("items/" + it.id).update(patch); saved.textContent = "Saved"; setTimeout(() => (saved.textContent = ""), 1500); }
+      catch (e) { saved.textContent = "Not saved: " + (e && e.code === "invalid_argument" ? "you can't edit this list" : "try again"); }
+    };
+    sel.addEventListener("change", () => save({ status: sel.value }));
+    let t; ta.addEventListener("input", () => { clearTimeout(t); t = setTimeout(() => save({ notes: ta.value }), 700); });
+    parts.push(el("div", { class: "note-bar" },
+      el("label", { for: sel.id }, "Status", sel),
+      el("label", { class: "grow", for: ta.id }, "Notes", ta),
+      saved));
+    if (it.checkedAt) parts.push(el("div", { class: "checked", text: "Checked on the retailer's page " + fmtDate(it.checkedAt) }));
+
+    return el("article", { class: "item" }, ...parts);
+  }
+
+  function render() {
+    $("#n-pass").textContent = items.filter((i) => i.verdict === "pass").length;
+    $("#n-near").textContent = items.filter((i) => i.verdict === "near").length;
+    $("#n-short").textContent = items.filter((i) => i.status && i.status !== "not-for-me").length;
+    const list = $("#list"); list.replaceChildren();
+    const rows = filtered().sort((a, b) => (a.rank ?? 999) - (b.rank ?? 999));
+    if (!rows.length) {
+      const msg = view === "short"
+        ? ["Nothing shortlisted yet.", " Set a status like “To try” on any pair and it appears here."]
+        : view === "near"
+        ? ["No near misses recorded.", " Pairs that fail one check, such as thigh too tight, are listed here with the reason."]
+        : ["No checked results yet.", " Tell Claude “run a search”. Each pair that passes every fit, stock and returns check shows up here with the size to order."];
+      list.append(el("div", { class: "empty" }, el("b", { text: msg[0] }), msg[1]));
+      return;
+    }
+    for (const it of rows) list.append(card(it));
+  }
+
+  async function start() {
+    setView(view);
+    if (!window.claude || !window.claude.use) return;
+    db = await window.claude.use("db");
+    if (!db) return;
+    db.collection("items").onSnapshot((snap) => {
+      items = snap.docs.map((d) => Object.assign({ id: d.id }, d.data()));
+      // don't redraw under someone typing a note; redraw when they leave the field
+      const a = document.activeElement;
+      if (a && a.tagName === "TEXTAREA") { a.addEventListener("blur", render, { once: true }); return; }
+      render();
+    }, () => {});
+    db.doc("meta/lastRun").onSnapshot((d) => {
+      if (!d.exists) return;
+      const r = d.data();
+      const line = $("#runline"); line.replaceChildren();
+      line.append(el("span", {}, "Last search: ", el("b", { text: fmtDate(r.at) })));
+      if (r.checked != null) line.append(el("span", {}, "Pages checked: ", el("b", { text: String(r.checked) })));
+      if (r.retailers) line.append(el("span", {}, "Retailers: ", el("b", { text: r.retailers })));
+      if (r.note) line.append(el("span", { text: r.note }));
+    }, () => {});
+  }
+  start();
+})();
+</script>
