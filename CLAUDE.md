@@ -55,3 +55,13 @@ checkedAt (ISO), status (user-owned), notes (user-owned)
 `meta/lastRun`: `{ at (ISO), checked (pages opened), retailers (string), note? }`
 
 On re-runs: flag new items, price changes, sold-out sizes; keep user `status`/`notes`.
+
+### Retailer access notes (from run 2026-10-03)
+
+- **Zara:** `<product-url>&ajax=true` via curl returns JSON with composition + per-size stock. Browser and size guide blocked (Akamai). Sizes are waist inches (30/31/32/34).
+- **M&S:** headless Chromium works; `__NEXT_DATA__` → `props.pageProps.productDetails` has composition and live per-SKU `inventory.quantity`. Inside leg: Short 29″, Regular 31″. No thigh/hem published.
+- **Uniqlo:** API works with header `x-fr-clientid: uq.gb.web-spa` (`/uk/api/commerce/v5/en/products/<id>/price-groups/00/details` and `/l2s?withStocks=true`). Size-chart pages are blocked. UK lengths are 32″/34″ (too long).
+- **Shopify feeds (`/products.json`)** work for T.M.Lewin, Percival, Kit Blake (stock per variant).
+- **Spoke:** Next.js `__NEXT_DATA__` on collection pages has prices; almost everything is over £110.
+- **Blocked:** Next, Reiss, H&M, COS, Arket, ASOS, John Lewis, Massimo Dutti, Suitsupply, Hawes & Curtis.
+- Under £110 nobody reachable publishes garment thigh/hem, so items go to `near` with that reason unless measurements are found.
