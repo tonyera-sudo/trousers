@@ -10,6 +10,13 @@ verify each one on the retailer's live product page, and write the results to th
 
 **What:** normal, versatile smart trousers. Not jeans, not soft/fluffy cotton chinos.
 
+**HARD GATE (user's core rule — apply before anything else):**
+- **Pleated only.** Listing must say pleat/pleated. Flat front = excluded, no exceptions.
+- **No suit trousers.** Anything sold as part of a suit / with a matching jacket = excluded.
+- Pleated + **tapered** ranks top; pleated + straight/regular next.
+- Reject slim/skinny (thigh) and wide/barrel/balloon/loose/baggy, or "relaxed" without "tapered" (hem).
+- Garment measurements are rarely published: do NOT require them. Use them only when given (they override).
+
 | Point (garment, flat) | Target | Hard rule |
 |---|---|---|
 | Waist | 16–16.5" | |
@@ -38,7 +45,7 @@ Size hints (starting points only — measurements decide): Zara EU 38 (length fi
 2. For each candidate, open the live product page. Record: price, colour, fabric %, stock for the
    recommended size AND length, size-chart garment measurements, returns method/fee.
 3. Pick the best size by measurements; score every point good / warn / bad against the table.
-4. `verdict: "pass"` only if no hard rule fails, colour/fabric/budget/returns pass, and the size is in stock.
+4. `verdict: "pass"` if it passes the gate, colour/fabric/budget/returns pass, the size is in stock, and no published measurement breaks a hard rule.
    Fails one check narrowly → `verdict: "near"` with a plain `reason`. Otherwise drop it.
 5. Write to the artifact db with ArtifactData (batch). Never overwrite `status` or `notes` the user set.
 
@@ -64,4 +71,5 @@ On re-runs: flag new items, price changes, sold-out sizes; keep user `status`/`n
 - **Shopify feeds (`/products.json`)** work for T.M.Lewin, Percival, Kit Blake (stock per variant).
 - **Spoke:** Next.js `__NEXT_DATA__` on collection pages has prices; almost everything is over £110.
 - **Blocked:** Next, Reiss, H&M, COS, Arket, ASOS, John Lewis, Massimo Dutti, Suitsupply, Hawes & Curtis.
-- Under £110 nobody reachable publishes garment thigh/hem, so items go to `near` with that reason unless measurements are found.
+- Wax London (Shopify) publishes garment measurements in the product page HTML size guide (waist/thigh/hem/inside leg). Aubyn = pleated + tapered.
+- Zara's pleated range is almost all relaxed/wide/balloon; check `?page=N&ajax=true` on `man-trousers-l838.html`.
