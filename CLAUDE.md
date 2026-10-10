@@ -32,7 +32,7 @@ Size hints (starting points only — measurements decide): Zara EU 38 (length fi
 
 - **Fabric:** wool preferred; drape matters most. Blends/synthetics fine if smart. Stretch fine, not needed.
 - **Colours:** navy, brown, charcoal/dark grey, black ONLY. Never light grey, beige, khaki, green, pink, red, purple, white.
-- **Style:** single pleat favoured; flat front OK if thigh passes. Mid rise, well below belly button (higher OK if fit perfect). Break: touching or just above shoe (trainers, Solovair Gibsons, brogues, boots).
+- **Style:** pleated only (single pleat favoured). Mid rise, well below belly button (higher OK if fit perfect). Break: touching or just above shoe (trainers, Solovair Gibsons, brogues, boots).
 - **Budget:** ≤ £110. **New only.** **Location:** Wales, UK.
 - **Returns pass:** start online → QR code → drop at Post Office. Free preferred; a small fee is OK (show it).
   Fail: print-your-own label, email-to-request, store-only, high fees.
